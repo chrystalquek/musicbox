@@ -6,6 +6,22 @@ from pydub.playback import play
 from time import sleep
 from numpy import fft as fft
 
+
+# takes in input [(midi_note, note duration)]
+def parsePieceToPartition(piece_note_durations):
+    # TODO consider rest as lengthened note since its one flick?
+    length_of_piece = sum([note_duration[1] for note_duration in piece_note_durations])
+    assert length_of_piece <= 18
+    partition = np.full((length_of_piece, 18), False)
+    curr_idx = 0
+    for midi_note, duration in piece_note_durations:
+        for _ in range(duration):
+            partition[curr_idx][midi_note] = True
+            curr_idx += 1
+    return partition
+        
+    
+
 #load a partition data from string
 def parsePartition(dataStr):
     lines = dataStr.split('\n')
@@ -145,6 +161,7 @@ def calculateVertex(center, z, angle, radius):
     return np.array( [x,y,z])
 
 def generateTriangleList(center,sheet, height=20,radius=6.5, layerHeight=0.2, bump_delta = 0.9, startZ = 1.35, endZ = 17.55, mainLayerWidth = 0.6, bottomLayerWidth = 0.3, topLayerWidth = 0.6):
+    print("sheet.shape", sheet.shape)
     print("generating triangle list...")
     n1 = round(height/layerHeight)
     n2 = 192#288
