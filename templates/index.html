@@ -39,10 +39,15 @@
 
 </form>
 
-<h1>File Download</h1>
+<h1>
     <a  href="/download_file" download>
         <button id="downloadButton" disabled>Download File</button>
     </a>
+    <a  href="/play_song">
+        <button id="playButton" disabled>Play Song</button>
+    </a>
+</h1>
+    
 
 
 
@@ -58,7 +63,8 @@
             })
             .then(response => {
                 if (response.ok) {
-                    document.getElementById('downloadButton').disabled = false; // Enable download button
+                    document.getElementById('downloadButton').disabled = false;
+                    document.getElementById('playButton').disabled = false;
                 }
             })
             .catch(error => console.error('Error:', error));

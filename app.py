@@ -1,12 +1,17 @@
 from flask import Flask, request, render_template, send_file
-from constants import MIDI_NOTES, NOTE_DURATION, NUM_TONES, NUM_BEATS
+from constants import MIDI_NOTES, NOTE_DURATION, NUM_TONES, NUM_BEATS, FREQUENCIES
 import musicBoxMaker
 import numpy as np
+from pydub import AudioSegment
+from pydub.playback import play
+from pydub.generators import Sine
 
 app = Flask(__name__)
 
 
 GCODE_FILE_NAME = "result_cylinder2.gcode"
+NOTES_AUDIO_FILE_NAME = "recording_notes.mp3"
+AUDIO_FILE_NAME = "result_song.wav"
 
 @app.route('/')
 def index():
@@ -20,11 +25,10 @@ def gcode():
 
     for i in range(NUM_TONES):
         for j in range(NUM_BEATS):
-            print(i,j)
             checkbox_name = f'checkbox_{i}_{j}'
             partition[j, i] = bool(request.form.get(checkbox_name)) # flip!
             
-    partition = partition.transpose() # i think the original code is buggy
+    partition = partition.transpose() # i think the original code is buggy so i had to add this in
             
     
     with open ("example_prefix.gcode", "r") as myfile:
@@ -40,6 +44,22 @@ def gcode():
         myfile.write(gcode_file)
         print("Done!!!")
         
+        
+    # audio
+    startTimes = [4984, 5538, 6071, 6647, 7249, 7736, 8288, 8910, 9485, 9984, 10705, 11322, 11953, 12615, 13210, 13825, 14553, 15237]
+    noteLength = 200 #length of each note (in ms)
+    song = AudioSegment.empty()
+    nbNotes = partition.shape[0]
+    for i in range(partition.shape[1]):#loop over the partition
+        note = AudioSegment.silent(duration=noteLength)
+        for j in range(nbNotes):#loop over the notes
+            if partition[nbNotes-j-1,i]:
+                freq_of_note = FREQUENCIES[j]
+                note = note.overlay(Sine(freq_of_note).to_audio_segment(duration=300))
+        song += note
+        
+    song.export(AUDIO_FILE_NAME, format='wav')
+
     return '', 200
     
     # return send_file(gcode_file, as_attachment=True)
@@ -48,4 +68,13 @@ def gcode():
 def download_file():
     # Return the generated file for download
     return send_file(GCODE_FILE_NAME, as_attachment=True)
+
+
+@app.route('/play_song')
+def play_song():
+
+    song = AudioSegment.from_wav(AUDIO_FILE_NAME)
+    play(song)
+    
+    return '', 200
 
