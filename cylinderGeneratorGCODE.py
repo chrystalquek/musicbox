@@ -5,9 +5,9 @@ suffix = ""
 #load the prefix and suffix gcode (for initialization and finish). 
 #Generate one gcode from your favorite software and copy paste the sections before and after the print of the object itself
 #Make sure to adjust the parameter start_extrusion_val for the generateGCODE function
-with open ("prefix.gcode", "r") as myfile:
+with open ("example_prefix.gcode", "r") as myfile:
     prefix=str(myfile.read())
-with open ("suffix.gcode", "r") as myfile:
+with open ("example_suffix.gcode", "r") as myfile:
     suffix=str(myfile.read())
 
 partition = musicBoxMaker.parsePartitionFile("listNotes.txt")#put your partition here
