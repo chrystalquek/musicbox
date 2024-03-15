@@ -8,3 +8,6 @@ NOTE_DURATION = {
     "quaver": 1,
     "crotchet": 2
 }
+
+NUM_TONES = 10
+NUM_BEATS = 18
