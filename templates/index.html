@@ -11,33 +11,38 @@
 </head>
 <body>
    <h1>Welcome to MidiNoteToGCODE converter</h1>
-   <form id="dataForm">
+   <div id="container">
+    <div id="imgdiv">
+       <img src="static/keyboard.jpg" height="370px"/>
+    </div>
+    <div id="datadiv">
+        <form id="dataForm">
 
-    <table>
-        <caption>Drum Design: Tones against Time</caption>
-        <thead>
-            <tr>
-                <th></th>
-                {% for j in range(num_beats) %}
-                    <th>{{ j + 1 }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for i in range(num_tones) %}
-                <tr>
-                    <td>{{ i + 1 }}</td>
-                    {% for j in range(num_beats) %}
-                        <td><input type="checkbox" name="checkbox_{{ i }}_{{ j }}"></td>
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        {% for j in range(num_beats) %}
+                            <th>{{ j + 1 }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(num_tones) %}
+                        <tr>
+                            <td>{{ notes[num_tones - i - 1] }}</td>
+                            {% for j in range(num_beats) %}
+                                <td><input type="checkbox" name="checkbox_{{ i }}_{{ j }}"></td>
+                            {% endfor %}
+                        </tr>
                     {% endfor %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                </tbody>
+            </table>
 
-    <button type="submit" class="btn btn-primary">Submit</button> 
+            <button type="submit" class="btn btn-primary">Submit</button> 
 
-</form>
+        </form>
+    </div>
 
 <h1>
     <a  href="/download_file" download>

@@ -205,6 +205,13 @@ def generateTriangleList(center,sheet, height=20,radius=6.5, layerHeight=0.2, bu
             oldSheetX = sheetX
         listLayers.append(currentLayer)
         listLayerWidth.append(layerWidth)
+        
+    spare_layer = [listLayers[0][0] for _ in range(len(listLayers[0]))]
+    print(listLayers[0][0], len(listLayers), len(listLayers[0])) # 150 (num layers), 192 (arc length)
+    bump_width = n1 // sheet.shape[0]
+    for i in range(len(listLayers)):
+        if (i % bump_width) == 0 or ((i + 1) % bump_width) == 0 or ((i - 1) % bump_width) == 0 or ((i + 2) % bump_width) == 0: # spacing between bumps is 3
+            listLayers[i] = spare_layer
 
     #generates the list of triangles
     listTriangles = []

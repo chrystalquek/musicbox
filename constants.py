@@ -1,27 +1,25 @@
-_midi_notes = ["c4", "d4", "e4", "f4", "g4", "a4", "b4", "c5",
-              "c5", "d5", "e5", "f5", "g5", "a5", "b5", "c6",
-              "c6", "d6", "e6", "f6", "g6", "a6", "b6", "c7"]
+from collections import OrderedDict
 
-MIDI_NOTES = {note: idx for idx, note in enumerate(_midi_notes)}
-
-NOTE_DURATION = {
-    "quaver": 1,
-    "crotchet": 2
-}
-
-NUM_TONES = 10
-NUM_BEATS = 18
+NUM_TONES = 15
+NUM_BEATS = 50
 
 
-FREQUENCIES = [
-    261.63,  # C4
-    293.66,  # D4
-    329.63,  # E4
-    349.23,  # F4
-    392.00,  # G4
-    440.00,  # A4
-    493.88,  # B4
-    523.25,  # C5
-    587.33,  # D5
-    659.25   # E5
-]
+NOTE_TO_FREQUENCY = OrderedDict({
+    'C4': 261.63,
+    'D4': 293.66,
+    'E4': 329.63,
+    'F4': 349.23,
+    'G4': 392.00,
+    'A4': 440.00,
+    'B4': 493.88,
+    'C5': 523.25,
+    'D5': 587.33,
+    'E5': 659.25,
+    'F5': 698.46,
+    'G5': 783.99,
+    'A5': 880.00,
+    'B5': 987.77,
+    'C6': 1046.50
+})
+
+NOTES = list(NOTE_TO_FREQUENCY.keys())

@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, send_file
-from constants import MIDI_NOTES, NOTE_DURATION, NUM_TONES, NUM_BEATS, FREQUENCIES
+from constants import NUM_TONES, NUM_BEATS, NOTES
 import musicBoxMaker
 import numpy as np
 from pydub import AudioSegment
@@ -7,6 +7,8 @@ from pydub.playback import play
 from pydub.generators import Sine
 
 app = Flask(__name__)
+
+app.jinja_env.globals['len'] = len
 
 
 GCODE_FILE_NAME = "result_cylinder2.gcode"
@@ -17,7 +19,8 @@ AUDIO_FILE_NAME = "result_song.wav"
 def index():
     return render_template('index.html',
                            num_tones=NUM_TONES,
-                           num_beats=NUM_BEATS)
+                           num_beats=NUM_BEATS,
+                           notes = NOTES)
 
 @app.route('/gcode', methods=['POST'])
 def gcode():    
