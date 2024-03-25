@@ -16,7 +16,7 @@
        <img src="static/keyboard.jpg" height="370px"/>
     </div>
     <div id="datadiv">
-        <form id="dataForm">
+        <form method="post">
 
             <table>
                 <thead>
@@ -39,43 +39,82 @@
                 </tbody>
             </table>
 
-            <button type="submit" class="btn btn-primary">Submit</button> 
+
+
+            <button type="submit" id="downloadButton">Download STL File</button>
+            <button type="submit" id="playButton">Play Song</button>
+            <audio id="audioPlayer" src="../result_song.wav"></audio>
+
+
+
+            <div id="spinnerContainer" class="loadingSpinner hidden"></div>
+
+            
+            
 
         </form>
+        
     </div>
-
-<h1>
-    <a  href="/download_file" download>
-        <button id="downloadButton" disabled>Download File</button>
-    </a>
-    <a  href="/play_song">
-        <button id="playButton" disabled>Play Song</button>
-    </a>
-</h1>
-    
-
-
-
-    <script>
-        document.getElementById('dataForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            var formData = new FormData(this);
-            
-            // Submit form data to Flask backend
-            fetch('/gcode', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (response.ok) {
-                    document.getElementById('downloadButton').disabled = false;
-                    document.getElementById('playButton').disabled = false;
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    </script>
     
 
 </body>
+
+<script>
+    document.getElementById('downloadButton').addEventListener('click', function(event) {
+       
+        event.preventDefault();
+        document.getElementById('spinnerContainer').classList.remove('hidden');
+        var formData = new FormData(this.form);
+
+        // Submit form data to Flask backend
+        fetch('/stl', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.blob();
+            }
+        })
+        .then(blob => {
+            // Create a temporary URL for the Blob
+            const url = URL.createObjectURL(blob);
+            // Create a temporary <a> element to trigger the download
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'drum.stl'; // Set the filename for the download
+            // Simulate a click on the <a> element to initiate the download
+            link.click();
+            // Clean up: Revoke the temporary URL
+            URL.revokeObjectURL(url);
+            document.getElementById('spinnerContainer').classList.add('hidden'); // Hide spinner
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+
+    document.getElementById('playButton').addEventListener('click', function(event) {
+       
+        event.preventDefault();
+        var audioPlayer = document.getElementById('audioPlayer');
+        // document.getElementById('spinnerContainer').classList.remove('hidden');
+        var formData = new FormData(this.form);
+
+        // Submit form data to Flask backend
+        fetch('/song', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log("playy!")
+                audioPlayer.play();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+</script>
+
+
 </html>
