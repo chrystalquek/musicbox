@@ -7,19 +7,29 @@ h1 {
 
 
 th, td {
-    padding: 3px;
     text-align: center;
 }
-tr {
-    border: 1px solid black; /* Add border to table rows */
-}
-th:first-child, td:first-child {
-    border-left: 1px solid black; /* Remove left border for first column */
-}
-th:last-child, td:last-child {
+table {
     border-right: 1px solid black; /* Remove right border for last column */
 }
-th, tr {
-    border-top: 1px solid black; /* Add top border */
-    border-bottom: 1px solid black; /* Add bottom border */
+
+#imgdiv
+{
+   float:left;
+}
+#datadiv
+{
+   float:right
+}
+#container
+{
+   display: inline-block
+}
+
+.rotate-90 {
+    transform: rotate(90deg);
+}
+
+.centered {
+    text-align: center;
 }

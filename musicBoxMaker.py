@@ -57,6 +57,9 @@ def parsePartitionFile(filename):
     with open(filename, 'r') as file:
         data = file.read()
         return parsePartition(data)
+    
+    
+# 
 
 #generate the gcode for the music box cylinder
 def generateGCODE(center, sheet, start_extrusion_val, prefix, suffix, height=20,radius=6.5, bump_delta = 0.9, layerHeight=0.2, startZ = 1.35, endZ = 17.55, filament_diameter = 1.75, mainLayerWidth = 0.6, bottomLayerWidth = 0.3, topLayerWidth = 0.6):
@@ -167,7 +170,7 @@ def generateTriangleList(center,sheet, height=20,radius=6.5, layerHeight=0.2, bu
     n2 = 192#288
     listLayers = []
     listLayerWidth = []
-    for i in range(n1):#vertical loop
+    for i in range(n1):#vertical loop: point on height
         z = layerHeight*i
 
         #set the layer width
@@ -179,7 +182,7 @@ def generateTriangleList(center,sheet, height=20,radius=6.5, layerHeight=0.2, bu
         r = radius - layerWidth/2
         oldSheetX = -1
         currentLayer = []
-        for j in range(n2):#angular loop
+        for j in range(n2):#angular loop: point on arc length
             angle = 2*math.pi*j/n2
             r2 = r
 
@@ -188,10 +191,14 @@ def generateTriangleList(center,sheet, height=20,radius=6.5, layerHeight=0.2, bu
             #position in the partition
             sheetY = sheet.shape[0]*(z-startZ)/(endZ-startZ)
             sheetX = sheet.shape[1]*angle/(2*math.pi)
+            
+            # print(sheetY)
+            # print(sheetX)
 
             bump = False
             #detect the start of a bump
             if sheetY >= 0 and sheetY < sheet.shape[0] and sheetX >= 0 and sheetX < sheet.shape[1] and sheet[int(sheetY),sheet.shape[1]-int(sheetX)-1] > 0:
+                # TODO: make it detect bumps differently
                 bump = True
             
             #apply the bump
@@ -201,10 +208,25 @@ def generateTriangleList(center,sheet, height=20,radius=6.5, layerHeight=0.2, bu
             elif bump == True:
                 alpha = (bump_delta/2) * (1.0 + min(1.0, 2*(sheetY - int(sheetY)))) * (1 + int(sheetX) - sheetX )
                 r2 += alpha
-            currentLayer.append(r2)
+            currentLayer.append(r2) # how much to extrude out for the bump
             oldSheetX = sheetX
-        listLayers.append(currentLayer)
+        listLayers.append(currentLayer) 
         listLayerWidth.append(layerWidth)
+        
+    # TODO space out listLayerWidth
+    # num layers: 160 for 32mm height
+    # 150 for 30mm height
+    spare_layer = [listLayers[0][0] for _ in range(len(listLayers[0]))]
+    print(listLayers[0][0], len(listLayers), len(listLayers[0])) # 150 (num layers), 192 (arc length)
+    bump_width = n1 // sheet.shape[0]
+    for i in range(len(listLayers)):
+        if (i % bump_width) == 0 or ((i + 1) % bump_width) == 0 or ((i - 1) % bump_width) == 0 or ((i + 2) % bump_width) == 0: # spacing between bumps is 3
+            listLayers[i] = spare_layer
+            
+    # [0-9] -> get rid of 01, 89
+    # [10-19] -> get rid of 1011, 18,19
+    # ...
+    # [140-149]
 
     #generates the list of triangles
     listTriangles = []
@@ -216,7 +238,7 @@ def generateTriangleList(center,sheet, height=20,radius=6.5, layerHeight=0.2, bu
         for j in range(n2):
             angle1 = 2*math.pi*j/n2
             angle2 = 2*math.pi*((j+1)%n2)/n2
-            p1 = calculateVertex(center, z1, angle1, listLayers[i1][j] + listLayerWidth[i1]/2)
+            p1 = calculateVertex(center, z1, angle1, listLayers[i1][j] + listLayerWidth[i1]/2) # outputs x,y,z
             p2 = calculateVertex(center, z2, angle1, listLayers[i2][j] + listLayerWidth[i2]/2)
             p3 = calculateVertex(center, z1, angle2, listLayers[i1][(j+1)%n2] + listLayerWidth[i1]/2)
             p4 = calculateVertex(center, z2, angle2, listLayers[i2][(j+1)%n2] + listLayerWidth[i2]/2)
@@ -228,12 +250,27 @@ def generateTriangleList(center,sheet, height=20,radius=6.5, layerHeight=0.2, bu
             listTriangles.append(p4)
             listTriangles.append(p2)
             listTriangles.append(p3)
-
-
-            p5 = calculateVertex(center, z1, angle1, radius - listLayerWidth[i1])# listLayers[i1][j] - listLayerWidth[i1]/2)
-            p6 = calculateVertex(center, z2, angle1, radius - listLayerWidth[i2])#listLayers[i2][j] - listLayerWidth[i2]/2)
-            p7 = calculateVertex(center, z1, angle2, radius - listLayerWidth[i1])#listLayers[i1][(j+1)%n2] - listLayerWidth[i1]/2)
-            p8 = calculateVertex(center, z2, angle2, radius - listLayerWidth[i2])#listLayers[i2][(j+1)%n2] - listLayerWidth[i2]/2)
+            
+            def in_range(jj):
+                arc_length_of_notch = 5
+                qtrs = n2 // 4
+                pt1 = 3 * qtrs
+                pt2 = qtrs
+                return abs(jj - pt1) < arc_length_of_notch or abs(jj - pt2) < arc_length_of_notch
+            
+            # in_range(j)
+            if False:
+                thickness_of_notch = 3
+                # we add abit to make the amt of thickness bigger
+                p5 = calculateVertex(center, z1, angle1, radius - (listLayerWidth[i1] + thickness_of_notch))# listLayers[i1][j] - listLayerWidth[i1]/2)
+                p6 = calculateVertex(center, z2, angle1, radius - (listLayerWidth[i2] + thickness_of_notch))#listLayers[i2][j] - listLayerWidth[i2]/2)
+                p7 = calculateVertex(center, z1, angle2, radius - (listLayerWidth[i1] + thickness_of_notch))#listLayers[i1][(j+1)%n2] - listLayerWidth[i1]/2)
+                p8 = calculateVertex(center, z2, angle2, radius - (listLayerWidth[i2] + thickness_of_notch))#listLayers[i2][(j+1)%n2] - listLayerWidth[i2]/2)
+            else:
+                p5 = calculateVertex(center, z1, angle1, radius - listLayerWidth[i1])# listLayers[i1][j] - listLayerWidth[i1]/2)
+                p6 = calculateVertex(center, z2, angle1, radius - listLayerWidth[i2])#listLayers[i2][j] - listLayerWidth[i2]/2)
+                p7 = calculateVertex(center, z1, angle2, radius - listLayerWidth[i1])#listLayers[i1][(j+1)%n2] - listLayerWidth[i1]/2)
+                p8 = calculateVertex(center, z2, angle2, radius - listLayerWidth[i2])#listLayers[i2][(j+1)%n2] - listLayerWidth[i2]/2)
 
             listTriangles.append(p5)
             listTriangles.append(p6)

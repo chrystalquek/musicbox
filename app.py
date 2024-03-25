@@ -1,5 +1,5 @@
-from flask import Flask, request, render_template, send_file
-from constants import MIDI_NOTES, NOTE_DURATION, NUM_TONES, NUM_BEATS, FREQUENCIES
+from flask import Flask, request, render_template, send_file, redirect, url_for
+from constants import MIDI_NOTES, NOTE_DURATION, NUM_COMBS, NUM_BEATS, FREQUENCIES, MIDI_NOTES_TO_FREQUENCIES
 import musicBoxMaker
 import numpy as np
 from pydub import AudioSegment
@@ -9,21 +9,73 @@ from pydub.generators import Sine
 app = Flask(__name__)
 
 
+app.jinja_env.globals['len'] = len
+
+
 GCODE_FILE_NAME = "result_cylinder2.gcode"
 NOTES_AUDIO_FILE_NAME = "recording_notes.mp3"
 AUDIO_FILE_NAME = "result_song.wav"
 
+import random
+
+def create_array():
+    # Initialize an empty array
+    arr = []
+
+    # Determine the number of 2s in the array
+    num_twos = random.randint(3, 9)
+
+    # Add the required number of 2s to the array
+    arr.extend([2] * num_twos)
+
+    # Calculate the remaining sum needed to reach 18
+    remaining_sum = NUM_COMBS - (num_twos * 2)
+
+    # Randomly distribute 0s and 1s to make up the remaining sum
+    while remaining_sum > 0:
+        if remaining_sum >= 1:
+            arr.append(1)
+            remaining_sum -= 1
+        else:
+            arr.append(0)
+            remaining_sum = 0
+
+    # Randomly add 0s to make the array length 20
+    while len(arr) < len(MIDI_NOTES_TO_FREQUENCIES):
+        arr.append(0)
+
+    # Shuffle the array to randomize the order
+    random.shuffle(arr)
+
+    return arr
+
+# Example usage
+array = create_array()
+print(array)
+print("Length of the array:", len(array))
+print("Sum of the array:", sum(array))
+
+
+
 @app.route('/')
 def index():
-    return render_template('index.html',
-                           num_tones=NUM_TONES,
+    return render_template('notes.html', num_combs=NUM_COMBS) # reach first page
+
+@app.route('/drum', methods=['GET', 'POST'])
+def drum():
+    # Get the form data from the URL parameters
+    checkbox_display = [int(x) for x in request.args.getlist('checkbox_display')]
+    print("drum_page checkbox_display", checkbox_display)
+    return render_template('drum.html', 
+                           checkbox_display=checkbox_display,
+                           midi_notes=list(MIDI_NOTES_TO_FREQUENCIES.keys()),
                            num_beats=NUM_BEATS)
 
 @app.route('/gcode', methods=['POST'])
 def gcode():    
-    partition = np.full((NUM_BEATS, NUM_TONES), False) # 
+    partition = np.full((NUM_BEATS, NUM_COMBS), False) # 
 
-    for i in range(NUM_TONES):
+    for i in range(NUM_COMBS):
         for j in range(NUM_BEATS):
             checkbox_name = f'checkbox_{i}_{j}'
             partition[j, i] = bool(request.form.get(checkbox_name)) # flip!
@@ -78,3 +130,42 @@ def play_song():
     
     return '', 200
 
+@app.route('/notes', methods=['GET', 'POST'])
+def notes():
+    if request.method == 'GET':
+        return render_template('notes.html', num_combs=NUM_COMBS)
+    
+    
+    # checkbox_display = create_array()
+    checkbox_display = [1 for _ in range(NUM_COMBS)]
+    checkbox_display.extend([0 for _ in range(len(MIDI_NOTES_TO_FREQUENCIES) - NUM_COMBS)])
+    assert(sum(checkbox_display) == NUM_COMBS)
+
+    print("checkbox_display", checkbox_display)
+    
+    return redirect(url_for('drum', checkbox_display=checkbox_display))
+
+    
+    text_fields = [request.form[f'field_{i}'] for i in range(NUM_COMBS)]
+    
+    # Do something with the collected values (e.g., store them in a database)
+    print("Collected text field values:", text_fields)
+    
+    checkbox_display = [0 for _ in range(len(MIDI_NOTES_TO_FREQUENCIES))] # 0 | 1 | 2
+
+    prev_idx_in_notes_to_freq = 0
+    for note in text_fields:
+        if note not in MIDI_NOTES_TO_FREQUENCIES:
+            print("note:", note, "is not recognised")
+        idx_in_notes_to_freq = list(MIDI_NOTES_TO_FREQUENCIES.keys()).index(note)
+        if idx_in_notes_to_freq < prev_idx_in_notes_to_freq:
+            print("why got later note come earlier?? represenation of piano is wrong")
+        checkbox_display[idx_in_notes_to_freq] += 1
+        
+    checkbox_display = [1 for _ in range(NUM_COMBS)] # 0 | 1 | 2 # REMOVE
+    checkbox_display.extend([0 for _ in range(len(MIDI_NOTES_TO_FREQUENCIES) - NUM_COMBS)])
+    assert(sum(checkbox_display) == NUM_COMBS)
+
+    print("checkbox_display", checkbox_display)
+    
+    return redirect(url_for('drum', checkbox_display=checkbox_display))
