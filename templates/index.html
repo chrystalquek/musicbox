@@ -11,64 +11,77 @@
 </head>
 <body>
    <h1>Welcome to MidiNoteToSTL converter</h1>
-   <div id="container">
+   <div class="verticalAlign">
+        <div id="container">
 
-    <div id="fraction">
-        <label for="timeSignature">Time Signature:</label>
-        <input type="number" id="timeSignature" name="timeSignature" min="1" max="8" step="1" size="50">
-        ---------
-        <input type="number" min="1" max="8" step="1" size="50">
+            <div id="fraction">
+                <div class="verticalAlign">
+                    <label for="timeSignature">Time Signature:</label>
+                    <input type="number" id="timeSignature" name="timeSignature" min="1" max="8" step="1" size="50">
+                    ---------
+                    <input type="number" min="1" max="8" step="1" size="50">
+                </div>
 
 
-        Choose a song to load:
-        <select id="sampleSongs">
-            {% for song_name, song in sample_songs.items() %}
-                <option value={{song_name}}>{{song_name}}</option>
-            {% endfor %}
-        </select>
-
-    </div>
-
-    <div id="imgdiv">
-       <img src="static/keyboard.jpg" height="450px"/>
-    </div>
-    <div id="datadiv">
-        <form method="post">
-
-            <table id="notestable">
-                <thead>
-                    <tr>
-                        <th></th>
-                        {% for j in range(num_beats) %}
-                            <th>{{ j + 1 }}</th>
+                <div class="verticalAlign">
+                    Choose a song to load:
+                    <select id="sampleSongs">
+                        {% for song_name, song in sample_songs.items() %}
+                            <option value={{song_name}}>{{song_name}}</option>
                         {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for i in range(num_tones) %}
-                        <tr>
-                            <td>{{ notes[num_tones - i - 1] }}</td>
-                            {% for j in range(num_beats) %}
-                                <td><input type="checkbox" name="checkbox_{{ i }}_{{ j }}"></td>
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            <div class="buttonContainer centered">
-
-
-                <button type="submit" id="downloadButton">Download STL File</button>
-                <button type="submit" id="playButton">Play Song</button>
-                <audio id="audioPlayer" src="../result_song.wav"></audio>
-
-                <div id="spinnerContainer" class="loadingSpinner hidden"></div>
+                    </select>
+                </div>
 
             </div>
 
-        </form>
+            <div id="imgdiv">
+            <img src="static/keyboard.jpg" height="450px"/>
+            </div>
+            
+            <div id="datadiv">
+                <form method="post">
+                    <div id="tableContainer">
+
+                        <table id="notestable">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    {% for j in range(num_beats) %}
+                                        <th>{{ j + 1 }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in range(num_tones) %}
+                                    <tr>
+                                        <td>{{ notes[num_tones - i - 1] }}</td>
+                                        {% for j in range(num_beats) %}
+                                            <td><input type="checkbox" name="checkbox_{{ i }}_{{ j }}"></td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </form>
+                
         
+            </div>
+        
+        </div>
+
+        <div id='buttonContainer'>
+
+
+            <button type="submit" id="downloadButton">Download STL File</button>
+            <button type="submit" id="playButton">Play Song</button>
+            <audio id="audioPlayer" src="../result_song.wav"></audio>
+
+            <div id="spinnerContainer" class="loadingSpinner hidden"></div>
+
+        </div>
+
     </div>
     
 

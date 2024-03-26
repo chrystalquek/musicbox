@@ -6,9 +6,15 @@ h1 {
 }
 
 #notestable {
+    width: 100%;
     border-collapse: collapse;
+}
+
+
+#tableContainer {
+    width: 70%;
     overflow-x: auto; /* Add horizontal scrollbar when content overflows */
-    white-space: nowrap; /* Prevent text from wrapping */
+    border: 1px solid red;
 }
 
 
@@ -30,8 +36,11 @@ th, tr {
     float:left;
     margin:20px;
     margin-top: 32px;
+    margin-bottom: 32px;
     padding:5px;
     border:1px solid black;
+    justify-content: space-evenly;
+
 }
 
 
@@ -44,7 +53,7 @@ th, tr {
 
 #container
 {
-   display: inline-block
+   display: flex; 
 }
 
 #datadiv
@@ -57,11 +66,12 @@ th, tr {
 }
 
 .buttonContainer {
-    text-align: center;
-    padding: 10px;
-    margin: 20px;
+    padding: 50px;
+    margin: 50px;
     border-top: 5px solid;
     border-bottom: 5px solid;
+    display: flex;
+    flex-direction: row; /* Stack items vertically */
 }
 
 .loadingSpinner {
@@ -80,6 +90,14 @@ th, tr {
 .hidden {
     display: none;
 }
+
+.verticalAlign {
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    padding: 10px;
+}
+
 
 @keyframes spin {
     0% { transform: rotate(0deg); }
