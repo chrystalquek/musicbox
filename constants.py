@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 NUM_TONES = 15
-NUM_BEATS = 50
+NUM_BEATS = 45
 
 
 NOTE_TO_FREQUENCY = OrderedDict({
