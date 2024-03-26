@@ -39,7 +39,7 @@
             </div>
             
             <div id="datadiv">
-                <form method="post">
+                <form id="songForm" method="post">
                     <div id="tableContainer">
 
                         <table id="notestable">
@@ -92,7 +92,7 @@
        
         event.preventDefault();
         document.getElementById('spinnerContainer').classList.remove('hidden');
-        var formData = new FormData(this.form);
+        var formData = new FormData(document.getElementById('songForm'));
 
         // Submit form data to Flask backend
         fetch('/stl', {
@@ -102,6 +102,7 @@
         .then(response => {
             if (response.ok) {
                 return response.blob();
+
             }
         })
         .then(blob => {
@@ -126,7 +127,7 @@
         event.preventDefault();
         var audioPlayer = document.getElementById('audioPlayer');
         document.getElementById('spinnerContainer').classList.remove('hidden');
-        var formData = new FormData(this.form);
+        var formData = new FormData(document.getElementById('songForm'));
 
         // Submit form data to Flask backend
         fetch('/song', {
@@ -186,13 +187,8 @@
 
         let idx = 0;
         checkboxes.forEach(function(checkbox) {
-            if (song[idx]) {
-                console.log("fkasnfdf")
-            }
-            
             checkbox.checked = song[idx];
             idx ++;
-            
         });
 
 

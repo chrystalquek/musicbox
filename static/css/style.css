@@ -12,9 +12,8 @@ h1 {
 
 
 #tableContainer {
-    width: 70%;
+    width: 800px;
     overflow-x: auto; /* Add horizontal scrollbar when content overflows */
-    border: 1px solid red;
 }
 
 

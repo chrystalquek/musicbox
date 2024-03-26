@@ -41,7 +41,7 @@ def parse_partition(req):
 def stl():    
             
     partition = parse_partition(request)
-    partition = np.fliplr(partition)
+    partition = np.flip(partition)
     
     listTri = musicBoxMaker.generateTriangleList(center=[110.0,110.0], height=30, radius=19.5, layerHeight=0.2, mainLayerWidth=2, bump_delta = 1.5, startZ = 0, endZ = 30, sheet=partition)
     musicBoxMaker.saveToSTL(STL_FILE_NAME, listTri)
