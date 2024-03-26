@@ -5,18 +5,38 @@ h1 {
     padding: 10px;
 }
 
+#notestable {
+    border-collapse: collapse;
+}
+
 
 th, td {
     text-align: center;
+    border-bottom: 1px solid rgb(209, 203, 194);
+    
 }
 th, tr {
     border-top: 1px solid black; /* Add top border */
     border-bottom: 1px solid black; /* Add bottom border */
+    height:30px;
 }
+
+#fraction {
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    float:left;
+    margin:20px;
+    margin-top: 32px;
+    padding:5px;
+    border:1px solid black;
+}
+
+
 
 #imgdiv
 {
-   margin-top: 20px;
+   margin-top: 32px;
    float:left;
 }
 
@@ -35,7 +55,11 @@ th, tr {
 }
 
 .buttonContainer {
-    display: inline-block;
+    text-align: center;
+    padding: 10px;
+    margin: 20px;
+    border-top: 5px solid;
+    border-bottom: 5px solid;
 }
 
 .loadingSpinner {
@@ -59,3 +83,5 @@ th, tr {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+

@@ -5,20 +5,28 @@
     <head>
         <meta charset="UTF-8">
         <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
-        <title>FlaskBlog</title>
+        <title>MidiNoteToSTL converter</title>
     </head>
-    <title>FlaskBlog</title>
+    <title>MidiNoteToSTL converter</title>
 </head>
 <body>
-   <h1>Welcome to MidiNoteToGCODE converter</h1>
+   <h1>Welcome to MidiNoteToSTL converter</h1>
    <div id="container">
+
+    <div id="fraction">
+        <label for="timeSignature">Time Signature:</label>
+        <input type="number" id="timeSignature" name="timeSignature" min="1" max="8" step="1" size="50">
+        ---------
+        <input type="number" min="1" max="8" step="1" size="50">
+    </div>
+
     <div id="imgdiv">
-       <img src="static/keyboard.jpg" height="370px"/>
+       <img src="static/keyboard.jpg" height="450px"/>
     </div>
     <div id="datadiv">
         <form method="post">
 
-            <table>
+            <table id="notestable">
                 <thead>
                     <tr>
                         <th></th>
@@ -39,18 +47,16 @@
                 </tbody>
             </table>
 
+            <div class="buttonContainer centered">
 
 
-            <button type="submit" id="downloadButton">Download STL File</button>
-            <button type="submit" id="playButton">Play Song</button>
-            <audio id="audioPlayer" src="../result_song.wav"></audio>
+                <button type="submit" id="downloadButton">Download STL File</button>
+                <button type="submit" id="playButton">Play Song</button>
+                <audio id="audioPlayer" src="../result_song.wav"></audio>
 
+                <div id="spinnerContainer" class="loadingSpinner hidden"></div>
 
-
-            <div id="spinnerContainer" class="loadingSpinner hidden"></div>
-
-            
-            
+            </div>
 
         </form>
         
@@ -97,7 +103,7 @@
        
         event.preventDefault();
         var audioPlayer = document.getElementById('audioPlayer');
-        // document.getElementById('spinnerContainer').classList.remove('hidden');
+        document.getElementById('spinnerContainer').classList.remove('hidden');
         var formData = new FormData(this.form);
 
         // Submit form data to Flask backend
@@ -107,12 +113,33 @@
         })
         .then(response => {
             if (response.ok) {
-                console.log("playy!")
+                document.getElementById('spinnerContainer').classList.add('hidden'); // Hide spinner
                 audioPlayer.play();
+                
             }
         })
         .catch(error => console.error('Error:', error));
     });
+
+    document.getElementById('timeSignature').addEventListener('input', function(event) {
+        event.preventDefault();
+
+        const n = parseInt(event.target.value);
+
+        const selector = `td:nth-child(${n}n+1), th:nth-child(${n}n+1)`;
+
+        // Reset border styles for all elements with the class 'bordered-table'
+        document.querySelectorAll('td, th').forEach(element => {
+            element.style.borderRight = '';
+        });
+
+        // Apply border styles only to the selected elements
+        document.querySelectorAll(selector).forEach(element => {
+            element.style.borderRight = '1px solid black'; // Adjust border style as needed
+        });
+
+    });
+
 
 </script>
 
