@@ -7,6 +7,8 @@ h1 {
 
 #notestable {
     border-collapse: collapse;
+    overflow-x: auto; /* Add horizontal scrollbar when content overflows */
+    white-space: nowrap; /* Prevent text from wrapping */
 }
 
 

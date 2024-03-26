@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, send_file
-from constants import NUM_TONES, NUM_BEATS, NOTES, NOTE_TO_FREQUENCY
+from constants import NUM_TONES, NUM_BEATS, NOTES, NOTE_TO_FREQUENCY, SONGS
 import musicBoxMaker
 import numpy as np
 from pydub import AudioSegment
@@ -20,7 +20,8 @@ def index():
     return render_template('index.html',
                            num_tones=NUM_TONES,
                            num_beats=NUM_BEATS,
-                           notes = NOTES)
+                           notes = NOTES,
+                           sample_songs = SONGS)
     
 
 def parse_partition(req):

@@ -18,6 +18,15 @@
         <input type="number" id="timeSignature" name="timeSignature" min="1" max="8" step="1" size="50">
         ---------
         <input type="number" min="1" max="8" step="1" size="50">
+
+
+        Choose a song to load:
+        <select id="sampleSongs">
+            {% for song_name, song in sample_songs.items() %}
+                <option value={{song_name}}>{{song_name}}</option>
+            {% endfor %}
+        </select>
+
     </div>
 
     <div id="imgdiv">
@@ -139,6 +148,43 @@
         });
 
     });
+
+
+    document.getElementById("sampleSongs").addEventListener('change', function() {
+        const songName = this.value;
+
+        let sampleSongs = "{{ sample_songs }}";
+        sampleSongs = sampleSongs.replace(/&#39;/g, '"')
+        sampleSongs = sampleSongs.replace(/F/g, 'f')
+        sampleSongs = sampleSongs.replace(/T/g, 't')
+
+        sampleSongs = JSON.parse(sampleSongs);
+
+        var song = [];
+        for (var sampleSongName in sampleSongs) {
+            if (sampleSongName.startsWith(songName)) {
+                song = sampleSongs[sampleSongName];
+                break;
+            }
+        }
+        song = song.flatMap(innerArray => innerArray);
+
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+        let idx = 0;
+        checkboxes.forEach(function(checkbox) {
+            if (song[idx]) {
+                console.log("fkasnfdf")
+            }
+            
+            checkbox.checked = song[idx];
+            idx ++;
+            
+        });
+
+
+    });
+    
 
 
 </script>
