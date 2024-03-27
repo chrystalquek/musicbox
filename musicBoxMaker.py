@@ -299,19 +299,24 @@ def saveToSTLBuffer(listTriangles):
         nbTri = len(listTriangles)//3
         print("starting to write to buffer")
         myfile.write(b"solid music_cylinder\n")
-        print("finished writing first setnece in buffer")
+        
         for i in range(nbTri):
             v1 = listTriangles[i * 3]
             v2 = listTriangles[i * 3 + 1]
             v3 = listTriangles[i * 3 + 2]
             n = np.cross(v2 - v1, v3 - v1)
             n /= np.sqrt(n.dot(n))
+            print("starting to write to buffer")
             myfile.write("facet normal {} {} {}\n".format(n[0], n[1], n[2]).encode())
+            print("1 finished writing first setnece in buffer")
             myfile.write(b"outer loop\n")
+            print("2 finished writing first setnece in buffer")
             myfile.write("vertex {} {} {}\n".format(v1[0], v1[1], v1[2]).encode())
+            print("3 finished writing first setnece in buffer")
             myfile.write("vertex {} {} {}\n".format(v2[0], v2[1], v2[2]).encode())
             myfile.write("vertex {} {} {}\n".format(v3[0], v3[1], v3[2]).encode())
             myfile.write(b"endloop\n")
+            print("4 finished writing first setnece in buffer")
             myfile.write(b"endfacet\n")
         myfile.write(b"endsolid music_cylinder\n")
         myfile.seek(0)
