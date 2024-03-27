@@ -11,9 +11,9 @@ app = Flask(__name__)
 app.jinja_env.globals['len'] = len
 
 
-STL_FILE_NAME = "result_cylinder3.stl"
-NOTES_AUDIO_FILE_NAME = "recording_notes.mp3"
-AUDIO_FILE_NAME = "result_song.wav"
+STL_FILE_NAME = "./static/result_cylinder3.stl"
+NOTES_AUDIO_FILE_NAME = "./static/recording_notes.mp3"
+AUDIO_FILE_NAME = "./static/result_song.wav"
 
 @app.route('/')
 def index():
