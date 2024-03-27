@@ -41,6 +41,10 @@ def stl():
     
     listTri = musicBoxMaker.generateTriangleList(center=[110.0,110.0], height=30, radius=19.5, layerHeight=0.2, mainLayerWidth=2, bump_delta = 1.5, startZ = 0, endZ = 30, sheet=partition)
     stl_buffer = musicBoxMaker.saveToSTLBuffer(listTri)
+    
+    stl_buffer.seek(0)
+    
+    print("gonna send it!")
 
     return send_file(stl_buffer, mimetype='application/octet-stream', as_attachment=False)
 
