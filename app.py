@@ -5,15 +5,11 @@ import numpy as np
 from pydub import AudioSegment
 from pydub.playback import play
 from pydub.generators import Sine
+import io
 
 app = Flask(__name__)
 
 app.jinja_env.globals['len'] = len
-
-
-STL_FILE_NAME = "./static/result_cylinder3.stl"
-NOTES_AUDIO_FILE_NAME = "./static/recording_notes.mp3"
-AUDIO_FILE_NAME = "./static/result_song.wav"
 
 @app.route('/')
 def index():
@@ -44,10 +40,9 @@ def stl():
     partition = np.flip(partition)
     
     listTri = musicBoxMaker.generateTriangleList(center=[110.0,110.0], height=30, radius=19.5, layerHeight=0.2, mainLayerWidth=2, bump_delta = 1.5, startZ = 0, endZ = 30, sheet=partition)
-    musicBoxMaker.saveToSTL(STL_FILE_NAME, listTri)
+    stl_buffer = musicBoxMaker.saveToSTLBuffer(listTri)
 
-    return send_file(STL_FILE_NAME, as_attachment=True)
-
+    return send_file(stl_buffer, mimetype='application/octet-stream', as_attachment=True, download_name="happy.stl")
 
 @app.route('/song', methods=['POST'])
 def song():
@@ -65,10 +60,9 @@ def song():
                 note = note.overlay(Sine(freq_of_note).to_audio_segment(duration=300))
         song += note
         
-    song.export(AUDIO_FILE_NAME, format='wav')
-
-    song = AudioSegment.from_wav(AUDIO_FILE_NAME)
-    play(song)
+    file_obj = io.BytesIO()
+    song.export(file_obj, format="wav")
+    file_obj.seek(0)
     
-    return '', 200
+    return send_file(file_obj, mimetype='audio/wav', as_attachment=False)
 

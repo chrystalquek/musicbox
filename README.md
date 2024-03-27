@@ -4,6 +4,8 @@ This project builds on https://github.com/RandomPrototypes/MusicBoxMaker.
 
 We provide a UI running on Flask to allow users to design their own music drums.
 
+The music box can be purchased here: https://a.co/d/hoPOHtp
+
 Features
 - Drum/Music Score Design, Time Signature Selection
 - Preview/play song

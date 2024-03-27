@@ -5,6 +5,7 @@ from pydub.playback import play
 #import musicalbeeps
 from time import sleep
 from numpy import fft as fft
+import io
 
 
 # takes in input [(midi_note, note duration)]
@@ -203,9 +204,10 @@ def generateTriangleList(center,sheet, height=20,radius=6.5, layerHeight=0.2, bu
                 r2 += alpha
             currentLayer.append(r2)
             oldSheetX = sheetX
-        listLayers.append(currentLayer)
-        listLayerWidth.append(layerWidth)
+        listLayers.append(currentLayer) # 2D array of actual points
+        listLayerWidth.append(layerWidth) # 1D array of generic width. can be ignored
         
+    # this sections adds spacing between different tone's bumps
     spare_layer = [listLayers[0][0] for _ in range(len(listLayers[0]))]
     print(listLayers[0][0], len(listLayers), len(listLayers[0])) # 150 (num layers), 192 (arc length)
     bump_width = n1 // sheet.shape[0]
@@ -235,7 +237,6 @@ def generateTriangleList(center,sheet, height=20,radius=6.5, layerHeight=0.2, bu
             listTriangles.append(p4)
             listTriangles.append(p2)
             listTriangles.append(p3)
-
 
             p5 = calculateVertex(center, z1, angle1, radius - listLayerWidth[i1])# listLayers[i1][j] - listLayerWidth[i1]/2)
             p6 = calculateVertex(center, z2, angle1, radius - listLayerWidth[i2])#listLayers[i2][j] - listLayerWidth[i2]/2)
@@ -291,3 +292,29 @@ def saveToSTL(filename, listTriangles):
             myfile.write("endfacet\n")
         myfile.write("endsolid music_cylinder\n")
     print("Done!!!")
+
+def saveToSTLBuffer(listTriangles):
+    try:
+        myfile = io.BytesIO()
+        nbTri = len(listTriangles)//3
+        myfile.write(b"solid music_cylinder\n")
+        for i in range(nbTri):
+            v1 = listTriangles[i * 3]
+            v2 = listTriangles[i * 3 + 1]
+            v3 = listTriangles[i * 3 + 2]
+            n = np.cross(v2 - v1, v3 - v1)
+            n /= np.sqrt(n.dot(n))
+            myfile.write("facet normal {} {} {}\n".format(n[0], n[1], n[2]).encode())
+            myfile.write(b"outer loop\n")
+            myfile.write("vertex {} {} {}\n".format(v1[0], v1[1], v1[2]).encode())
+            myfile.write("vertex {} {} {}\n".format(v2[0], v2[1], v2[2]).encode())
+            myfile.write("vertex {} {} {}\n".format(v3[0], v3[1], v3[2]).encode())
+            myfile.write(b"endloop\n")
+            myfile.write(b"endfacet\n")
+        myfile.write(b"endsolid music_cylinder\n")
+        myfile.seek(0)
+        print("Done!!!")
+        return myfile
+    except Exception as e:
+        print("Error:", e)
+        return None

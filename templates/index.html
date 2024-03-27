@@ -76,7 +76,6 @@
 
             <button type="submit" id="downloadButton">Download STL File</button>
             <button type="submit" id="playButton">Play Song</button>
-            <audio id="audioPlayer" src="../result_song.wav"></audio>
 
             <div id="spinnerContainer" class="loadingSpinner hidden"></div>
 
@@ -125,7 +124,6 @@
     document.getElementById('playButton').addEventListener('click', function(event) {
        
         event.preventDefault();
-        var audioPlayer = document.getElementById('audioPlayer');
         document.getElementById('spinnerContainer').classList.remove('hidden');
         var formData = new FormData(document.getElementById('songForm'));
 
@@ -136,10 +134,18 @@
         })
         .then(response => {
             if (response.ok) {
-                document.getElementById('spinnerContainer').classList.add('hidden'); // Hide spinner
-                audioPlayer.play();
-                
+                return response.arrayBuffer(); // Extract array buffer data
             }
+        })
+        .then(response => {
+            const audioContext = new AudioContext();
+            audioContext.decodeAudioData(response, function(decodedData) {
+                const source = audioContext.createBufferSource();
+                source.buffer = decodedData;
+                source.connect(audioContext.destination);
+                source.start(0);
+                document.getElementById('spinnerContainer').classList.add('hidden'); // Hide spinner
+            });
         })
         .catch(error => console.error('Error:', error));
     });
