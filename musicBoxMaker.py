@@ -297,7 +297,9 @@ def saveToSTLBuffer(listTriangles):
     try:
         myfile = io.BytesIO()
         nbTri = len(listTriangles)//3
+        print("starting to write to buffer")
         myfile.write(b"solid music_cylinder\n")
+        print("finished writing first setnece in buffer")
         for i in range(nbTri):
             v1 = listTriangles[i * 3]
             v2 = listTriangles[i * 3 + 1]
